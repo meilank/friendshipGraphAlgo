@@ -27,9 +27,6 @@ public class Friend
 
 		for(int i = 0; i < numPeople; i++)
 		{
-			/*if (isFirstLine) {
-
-                        }*/
 			line = sc.nextLine();
 			String [] lineArr = SplitUsingTokenizer(line,"|");
 			if(lineArr[1].contains("y"))
@@ -55,34 +52,10 @@ public class Friend
 			Person p2 = peopleMap.get(lineArr[1]);
 
 			peopleAdjLL.buildRelationship(p1,p2);
+
 		}
-
-		/*                //check relationships
-                for(String p : peopleAdjLL.peopleMap.keySet())
-                {
-                        Person curr = peopleMap.get(p);
-                        do
-                        {
-                                System.out.println(curr.name);
-                                curr = curr.next;
-                        }
-                        while(curr != null);
-                        System.out.println("--");
-                }*/
+		sc.close();
 	}
-
-	/*
-        public final boolean containsDigit(String s)
-        {
-                boolean containsDigit = false;
-                if(s != null)
-                        for(char c : s.toCharArray())
-                                if(containsDigit = Character.isDigit(c))
-                                        break;
-
-                return containsDigit;
-        }
-	 */
 
 	public static String[] SplitUsingTokenizer(String Subject, String Delimiters)
 	{
@@ -95,81 +68,83 @@ public class Friend
 		return ArrLis.toArray(new String[0]);
 	}
 
-	public void createPerson()
+	public AdjLL subGraph(String school, AdjLL graph)
 	{
-
-	}
-	//--------------------------------------------------------------------------------------------------------------
-	class Neighbor {
-		public int vertexNum;
-		public Neighbor next;
-		public Neighbor(int vnum, Neighbor nbr) {
-			this.vertexNum = vnum;
-			next = nbr;
-		}
-	}
-
-	class Vertex {
-		String name;
-		Neighbor adjList;
-		Vertex(String name, Neighbor neighbors) {
-			this.name = name;
-			this.adjList = neighbors;
-		}
-	}
-
-	public void subGraph(String school) {
-		String school2= school.toLowerCase();
-		String cool;
-		HashMap<String,Person> schoolMap = new HashMap<String,Person>();
-		ArrayList<Person> personList = new ArrayList<Person>();
-		cool= peopleAdjLL.search(school2);
-	}
-
-	public HashMap<String,Person> subGraphy(AdjLL graph, String school)
-	{
-		HashMap<String,Person> schoolMap = new HashMap<String,Person>();
-		ArrayList<Person> personList = new ArrayList<Person>();
+		ArrayList<Person> sameSchoolList = new ArrayList<Person>();
+		String schoolLower= school.toLowerCase();
 		for(String s : graph.peopleMap.keySet())
 		{
-			Person tempPerson = graph.peopleMap.get(s);
-			String tempSchool = tempPerson.school;
-
-			//below algorithm is to copy person that attends parameter school
-			//and all of his neighbors into a new hashmap called schoolMap
-			//MUST BE MORE EFFICIENT WAY TO DO THIS
-			//loop through peopleMap and find those that have matching schools
-			//when you find a match, copy it and all of its neighbors into an array
-			//then loop through array and connect them all into a linked list.
-			//lastly, put first node in the array into schoolMap
-			if(tempSchool.equals(school))
+			Person curr = graph.peopleMap.get(s);
+			Person currNew = null;
+			try
 			{
-
-				int i = 0;
-				Person curr = tempPerson;
-				do
+				if(curr.school.equals(school))
 				{
 					Person newPerson = new Person(curr.name, curr.school, null);
-					personList.add(newPerson);
-					i++;
+					System.out.println(curr.name + "|y|" + curr.school);
+					sameSchoolList.add(newPerson);
+					Person curr2 = newPerson;
+					currNew = newPerson;
 					curr = curr.next;
-				} while (curr != null);
+					do
+					{
+						try
+						{
+							if(curr.school.equals(schoolLower))
+							{
+								newPerson = new Person(curr.name, curr.school, null);
+								currNew.next = newPerson;
+								currNew = currNew.next;
+							}
+						}
+						catch(Exception e) {}
+						curr = curr.next;
+					} while(curr != null);
 
-				for(int j = 0; j < personList.size(); j++)
-					if(j != personList.size()-2)
-						if(personList.get(j+1).school.equals(school))
-							personList.get(j).next = personList.get(j+1);
-						else personList.remove(j+1);
-					else personList.get(j).next = null;
-
-				schoolMap.put(personList.get(0).name, personList.get(0));
-
+					do
+					{
+						curr2 = curr2.next;
+					}
+					while(curr2 != null);
+				}
 			}
+			catch(Exception e) {}
+
+
 		}
 
+		Person[] sameSchoolArr = sameSchoolList.toArray(new Person[sameSchoolList.size()]);
+		AdjLL sameSchoolAdjLL = new AdjLL(sameSchoolList.size(), sameSchoolArr);
 
+		return sameSchoolAdjLL;
+
+		/*String school2= school.toLowerCase();
+
+for(String s : graph.peopleMap.keySet())
+{
+Person curr = graph.peopleMap.get(s);
+if (curr.school == null || !curr.school.equals(school))
+continue;
+else
+System.out.println(peopleAdjLL.search(school2, s, curr));
+}*/
+	}
+
+
+	public Person shortestPath(String name) throws NoSuchPath {
 
 
 		return null;
+	}
+
+	public class NoSuchPath extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+		public void noPath() {
+			System.out.println("There is no path to this person");
+			return;
+		}
+
 	}
 }
